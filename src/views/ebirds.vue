@@ -6,7 +6,29 @@
         <v-btn @click="handleGetPlace">Get Place</v-btn>
       </v-col>
     </v-row>
-    <v-container id="mapBox"> </v-container>
+    <v-container class="map-box-holder">
+      <v-container id="mapBox"></v-container>
+      <v-container class="card-deck" v-scroll>
+        <v-card class="mx-auto" max-width="344" outlined>
+          <v-list-item three-line>
+            <v-list-item-content>
+              <div class="overline mb-4">OVERLINE</div>
+              <v-list-item-title class="headline mb-1">Headline 5</v-list-item-title>
+              <v-list-item-subtitle
+                >Greyhound divisely hello coldly fonwderfully</v-list-item-subtitle
+              >
+            </v-list-item-content>
+
+            <v-list-item-avatar tile size="80" color="grey"></v-list-item-avatar>
+          </v-list-item>
+
+          <v-card-actions>
+            <v-btn text>View</v-btn>
+            <v-btn text>Locate Similar</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-container>
+    </v-container>
     <v-data-table :headers="headers" :items="getListRecentObservations"></v-data-table>
   </v-container>
 </template>
@@ -20,7 +42,9 @@ export default {
   data: () => {
     return {
       searchPlace: "",
-      clickedRegionCode: ""
+      clickedRegionCode: "",
+      map: null,
+      markerAddedToMap: []
     };
   },
   computed: {
@@ -33,25 +57,32 @@ export default {
   },
   mounted() {
     // console.log(mapBoxGL);
-    const map = new mapBoxGL.Map({
+    this.map = new mapBoxGL.Map({
       container: "mapBox",
       style: "mapbox://styles/mapbox/streets-v11"
     });
-    map.on("click", async e => {
+    this.addControlToMap();
+    this.map.on("click", async e => {
       // The event object (e) contains information like the
       // coordinates of the point on the map that was clicked.
-      console.log(`A click event has occurred at  ${e.lngLat}`);
       const [longitude, latitude] = e.lngLat.toArray();
       const shortCode = await ebirdStore.dispatch("reverseGeocoding", { longitude, latitude });
       this.clickedRegionCode = shortCode.toUpperCase();
-      console.log(shortCode);
     });
   },
   methods: {
     async fetchAllCountries() {
       await ebirdStore.dispatch("getListOfCountries");
     },
+    addControlToMap() {
+      this.map.addControl(new mapBoxGL.NavigationControl());
+    },
     async handleGetPlace() {
+      if (this.markerAddedToMap.length > 0) {
+        this.markerAddedToMap.forEach(marker => {
+          marker.remove();
+        });
+      }
       const regionCode = this.clickedRegionCode;
       await ebirdStore.dispatch("fetchRecentObservations", {
         regionCode: regionCode.toUpperCase(),
@@ -60,13 +91,30 @@ export default {
           maxResults: 20
         }
       });
+      this.getListRecentObservations.forEach(obs => {
+        const marker = new mapBoxGL.Marker();
+        marker.setLngLat([obs.lng, obs.lat]);
+        marker.addTo(this.map);
+        this.markerAddedToMap.push(marker);
+      });
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
-#mapBox {
-  height: calc(100vh - 100px);
+.map-box-holder {
+  position: relative;
+  #mapBox {
+    height: calc(100vh - 100px);
+  }
+  .card-deck {
+    position: absolute;
+    background-color: transparent;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    padding-bottom: 25px;
+  }
 }
 </style>

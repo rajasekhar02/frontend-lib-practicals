@@ -28,6 +28,11 @@ const routes = [
     path: "/ebirds",
     name: "Ebrids",
     component: ebirdMap
+  },
+  {
+    path: "/stitch",
+    name: "MongoDBStitch",
+    component: () => import("../views/mongoStitchComments.vue")
   }
 ];
 

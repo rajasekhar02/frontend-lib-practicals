@@ -11,8 +11,10 @@
         <v-tab @click="handleClick('/ebirds')">
           <router-link to="/ebirds" value="ebird">Ebird Maps</router-link>
         </v-tab>
+        <v-tab @click="handleClick('/stitch')">
+          <router-link to="/stitch" value="stitch">Stitch</router-link>
+        </v-tab>
       </v-tabs>
-
       <router-view></router-view>
     </v-content>
   </v-app>
@@ -33,7 +35,7 @@ export default {
   methods: {
     handleClick(value) {
       this.$router.push(value);
-      console.log(value);
+      console.log(this.$store);
     }
   }
 };
