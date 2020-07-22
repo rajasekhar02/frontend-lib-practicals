@@ -29,12 +29,10 @@ export default {
     async fetchRecentObservations(context, { regionCode, params }) {
       const response = await getRecentObservations(regionCode, params);
       context.commit("SET_RECENT_OBSERVATION", response.data);
-      console.log(response);
     },
     async fetchAllCountries(context) {
       const response = await getListOfCountries();
       context.commit("SET_LIST_COUNTRIES", response);
-      console.log(response);
     },
     async reverseGeocoding(context, { longitude, latitude }) {
       const response = await reverseGeocodingService(longitude, latitude);
