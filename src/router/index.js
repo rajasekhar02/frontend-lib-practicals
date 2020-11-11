@@ -33,6 +33,11 @@ const routes = [
     path: "/stitch",
     name: "MongoDBStitch",
     component: () => import("../views/mongoStitchComments.vue")
+  },
+  {
+    path: "/quilljs",
+    name: "Rich Text Editor",
+    component: () => import("@/components/quillComponent.vue")
   }
 ];
 
